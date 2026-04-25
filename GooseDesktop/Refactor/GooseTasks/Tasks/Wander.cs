@@ -51,9 +51,10 @@ namespace GooseDesktop.Refactor.GooseTasks.Tasks
             }
             if (Time.time - wanderTaskData.pauseStartTime > wanderTaskData.pauseDuration)
             {
+                var desktopBounds = Program.GetDesktopBounds();
                 wanderTaskData.pauseStartTime = -1f;
                 float num = GetRandomWalkTime() * goose.currentSpeed;
-                goose.targetPos = new Vector2(SamMath.RandomRange(0f, (float)Program.mainForm.Width), SamMath.RandomRange(0f, (float)Program.mainForm.Height));
+                goose.targetPos = new Vector2(SamMath.RandomRange((float)desktopBounds.Left, (float)desktopBounds.Right), SamMath.RandomRange((float)desktopBounds.Top, (float)desktopBounds.Bottom));
                 if (Vector2.Distance(goose.position, goose.targetPos) > num)
                 {
                     goose.targetPos = goose.position + Vector2.Normalize(goose.targetPos - goose.position) * num;

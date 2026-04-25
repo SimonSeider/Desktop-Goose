@@ -48,12 +48,13 @@ namespace GooseDesktop
         [STAThread]
         private static void Main()
         {
+            Rectangle desktopBounds = GetDesktopBounds();
             mainForm = new Form();
             mainForm.BackColor = ColorKey;
             mainForm.FormBorderStyle = FormBorderStyle.None;
-            mainForm.Size = Screen.PrimaryScreen.WorkingArea.Size;
+            mainForm.Size = desktopBounds.Size;
             mainForm.StartPosition = FormStartPosition.Manual;
-            mainForm.Location = new Point(0, 0);
+            mainForm.Location = desktopBounds.Location;
             mainForm.TopMost = true;
             mainForm.AllowTransparency = true;
             mainForm.BackColor = ColorKey;
@@ -91,6 +92,11 @@ namespace GooseDesktop
             return Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), relativePath);
         }
 
+        public static Rectangle GetDesktopBounds()
+        {
+            return SystemInformation.VirtualScreen;
+        }
+
         private static bool IsApplicationIdle()
         {
             NativeMessage nativeMessage;
@@ -110,6 +116,7 @@ namespace GooseDesktop
 
         private static void Render(object sender, PaintEventArgs e)
         {
+            e.Graphics.TranslateTransform((float)(-mainForm.Left), (float)(-mainForm.Top));
             Refactor.MainGame.TickGame(e.Graphics);
         }
 

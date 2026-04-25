@@ -69,28 +69,31 @@ namespace GooseDesktop.Refactor.GooseTasks.Tasks
                 case CollectWindowTaskData.Stage.WaitingToBringWindowBack:
                     if (Time.time - taskData.waitStartTime > taskData.secsToWait)
                     {
+                        var desktopBounds = Program.GetDesktopBounds();
                         taskData.mainForm.FormClosing += OnGiftClosed;
-                        new Thread(new ThreadStart(() =>
+                        Thread dialogThread = new Thread(new ThreadStart(() =>
                         {
                             taskData.mainForm.ShowDialog();
-                        })).Start();
+                        }));
+                        dialogThread.SetApartmentState(ApartmentState.STA);
+                        dialogThread.Start();
                         switch (taskData.screenDirection)
                         {
                             case ScreenDirection.Left:
-                                goose.targetPos.y = SamMath.Lerp(goose.position.y, (float)(Program.mainForm.Height / 2), SamMath.RandomRange(0.2f, 0.3f));
-                                goose.targetPos.x = (float)taskData.mainForm.Width + SamMath.RandomRange(15f, 20f);
+                                goose.targetPos.y = SamMath.Lerp(goose.position.y, (float)(desktopBounds.Top + desktopBounds.Height / 2), SamMath.RandomRange(0.2f, 0.3f));
+                                goose.targetPos.x = (float)(desktopBounds.Left + taskData.mainForm.Width) + SamMath.RandomRange(15f, 20f);
                                 break;
                             case ScreenDirection.Top:
-                                goose.targetPos.y = (float)taskData.mainForm.Height + SamMath.RandomRange(80f, 100f);
-                                goose.targetPos.x = SamMath.Lerp(goose.position.x, (float)(Program.mainForm.Width / 2), SamMath.RandomRange(0.2f, 0.3f));
+                                goose.targetPos.y = (float)(desktopBounds.Top + taskData.mainForm.Height) + SamMath.RandomRange(80f, 100f);
+                                goose.targetPos.x = SamMath.Lerp(goose.position.x, (float)(desktopBounds.Left + desktopBounds.Width / 2), SamMath.RandomRange(0.2f, 0.3f));
                                 break;
                             case ScreenDirection.Right:
-                                goose.targetPos.y = SamMath.Lerp(goose.position.y, (float)(Program.mainForm.Height / 2), SamMath.RandomRange(0.2f, 0.3f));
-                                goose.targetPos.x = (float)Program.mainForm.Width - ((float)taskData.mainForm.Width + SamMath.RandomRange(20f, 30f));
+                                goose.targetPos.y = SamMath.Lerp(goose.position.y, (float)(desktopBounds.Top + desktopBounds.Height / 2), SamMath.RandomRange(0.2f, 0.3f));
+                                goose.targetPos.x = (float)desktopBounds.Right - ((float)taskData.mainForm.Width + SamMath.RandomRange(20f, 30f));
                                 break;
                         }
-                        goose.targetPos.x = SamMath.Clamp(goose.targetPos.x, (float)(taskData.mainForm.Width + 55), (float)(Program.mainForm.Width - (taskData.mainForm.Width + 55)));
-                        goose.targetPos.y = SamMath.Clamp(goose.targetPos.y, (float)(taskData.mainForm.Height + 80), (float)Program.mainForm.Height);
+                        goose.targetPos.x = SamMath.Clamp(goose.targetPos.x, (float)(desktopBounds.Left + taskData.mainForm.Width + 55), (float)(desktopBounds.Right - (taskData.mainForm.Width + 55)));
+                        goose.targetPos.y = SamMath.Clamp(goose.targetPos.y, (float)(desktopBounds.Top + taskData.mainForm.Height + 80), (float)desktopBounds.Bottom);
                         taskData.stage = CollectWindowTaskData.Stage.DraggingWindowBack;
                         return;
                     }

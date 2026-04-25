@@ -39,6 +39,7 @@ namespace GooseDesktop.Refactor.GooseTasks.Tasks
 
         public override void RunTask(GooseEntity g)
         {
+            var desktopBounds = Program.GetDesktopBounds();
             NabMouseData nabMouseData = (NabMouseData)g.currentTaskData;
             Vector2 vector = new Vector2((float)Cursor.Position.X, (float)Cursor.Position.Y);
             Vector2 head2EndPoint = g.rig.head2EndPoint;
@@ -53,7 +54,7 @@ namespace GooseDesktop.Refactor.GooseTasks.Tasks
                     nabMouseData.dragToPoint = g.position;
                     while (Vector2.Distance(nabMouseData.dragToPoint, g.position) / g.parameters.ChargeSpeed < 1.2f)
                     {
-                        nabMouseData.dragToPoint = new Vector2((float)SamMath.Rand.NextDouble() * (float)Program.mainForm.Width, (float)SamMath.Rand.NextDouble() * (float)Program.mainForm.Height);
+                        nabMouseData.dragToPoint = new Vector2(SamMath.RandomRange((float)desktopBounds.Left, (float)desktopBounds.Right), SamMath.RandomRange((float)desktopBounds.Top, (float)desktopBounds.Bottom));
                     }
                     g.targetPos = nabMouseData.dragToPoint;
                     SetForegroundWindow(Program.mainForm.Handle);

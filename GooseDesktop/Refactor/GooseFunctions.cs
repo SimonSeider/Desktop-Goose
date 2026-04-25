@@ -12,10 +12,11 @@ namespace GooseDesktop.Refactor
     {
         public static GooseEntity InitGoose()
         {
+            Rectangle desktopBounds = Program.GetDesktopBounds();
             GooseEntity gooseEntity = new GooseEntity(new GooseEntity.TickFunction(TickGoose), new GooseEntity.UpdateRigFunction(UpdateRig), new GooseEntity.RenderFunction(RenderGoose));
             gooseEntity.parameters = new GooseEntity.ParametersTable();
-            gooseEntity.position = new Vector2(-20f, 120f);
-            gooseEntity.targetPos = new Vector2(100f, 150f);
+            gooseEntity.position = new Vector2((float)(desktopBounds.Left - 20), (float)(desktopBounds.Top + 120));
+            gooseEntity.targetPos = new Vector2((float)(desktopBounds.Left + 100), (float)(desktopBounds.Top + 150));
             SetSpeed(gooseEntity, GooseEntity.SpeedTiers.Walk);
             gooseEntity.rig.feets = new ProceduralFeets();
             gooseEntity.rig.feets.lFootPos = ProceduralFeetFuncs.GetFootHome(gooseEntity.position, gooseEntity.direction, gooseEntity.rig.feets.feetDistanceApart, false);
@@ -211,19 +212,23 @@ namespace GooseDesktop.Refactor
 
         public static ScreenDirection SetTargetOffscreen(GooseEntity g, bool canExitTop = false)
         {
+            Rectangle desktopBounds = Program.GetDesktopBounds();
             int num = (int)g.position.x;
             ScreenDirection screenDirection = ScreenDirection.Left;
-            g.targetPos = new Vector2(-50f, SamMath.Lerp(g.position.y, (float)(Program.mainForm.Height / 2), 0.4f));
-            if (num > Program.mainForm.Width / 2)
+            float centerX = (float)(desktopBounds.Left + desktopBounds.Width / 2);
+            float centerY = (float)(desktopBounds.Top + desktopBounds.Height / 2);
+            g.targetPos = new Vector2((float)(desktopBounds.Left - 50), SamMath.Lerp(g.position.y, centerY, 0.4f));
+            if (num > desktopBounds.Left + desktopBounds.Width / 2)
             {
-                num = Program.mainForm.Width - (int)g.position.x;
+                num = desktopBounds.Right - (int)g.position.x;
                 screenDirection = ScreenDirection.Right;
-                g.targetPos = new Vector2((float)(Program.mainForm.Width + 50), SamMath.Lerp(g.position.y, (float)(Program.mainForm.Height / 2), 0.4f));
+                g.targetPos = new Vector2((float)(desktopBounds.Right + 50), SamMath.Lerp(g.position.y, centerY, 0.4f));
             }
-            if (canExitTop && (float)num > g.position.y)
+            float distanceToTop = g.position.y - (float)desktopBounds.Top;
+            if (canExitTop && (float)num > distanceToTop)
             {
                 screenDirection = ScreenDirection.Top;
-                g.targetPos = new Vector2(SamMath.Lerp(g.position.x, (float)(Program.mainForm.Width / 2), 0.4f), -50f);
+                g.targetPos = new Vector2(SamMath.Lerp(g.position.x, centerX, 0.4f), (float)(desktopBounds.Top - 50));
             }
             return screenDirection;
         }

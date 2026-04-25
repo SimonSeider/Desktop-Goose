@@ -23,6 +23,7 @@ namespace GooseDesktop.Refactor.GooseTasks.Tasks
 
         public override void RunTask(GooseEntity g)
         {
+            var desktopBounds = Program.GetDesktopBounds();
             TrackMudTaskData trackMudTaskData = (TrackMudTaskData)g.currentTaskData;
             switch (trackMudTaskData.stage)
             {
@@ -34,7 +35,7 @@ namespace GooseDesktop.Refactor.GooseTasks.Tasks
                 case TrackMudTaskData.Stage.RunningOffscreen:
                     if (Vector2.Distance(g.position, g.targetPos) < 5f)
                     {
-                        g.targetPos = new Vector2(SamMath.RandomRange(0f, (float)Program.mainForm.Width), SamMath.RandomRange(0f, (float)Program.mainForm.Height));
+                        g.targetPos = new Vector2(SamMath.RandomRange((float)desktopBounds.Left, (float)desktopBounds.Right), SamMath.RandomRange((float)desktopBounds.Top, (float)desktopBounds.Bottom));
                         trackMudTaskData.nextDirChangeTime = Time.time + TrackMudTaskData.GetDirChangeInterval();
                         trackMudTaskData.timeToStopRunning = Time.time + 2f;
                         g.trackMudEndTime = Time.time + g.parameters.DurationToTrackMud;
@@ -46,14 +47,14 @@ namespace GooseDesktop.Refactor.GooseTasks.Tasks
                 case TrackMudTaskData.Stage.RunningWandering:
                     if (Vector2.Distance(g.position, g.targetPos) < 5f || Time.time > trackMudTaskData.nextDirChangeTime)
                     {
-                        g.targetPos = new Vector2(SamMath.RandomRange(0f, (float)Program.mainForm.Width), SamMath.RandomRange(0f, (float)Program.mainForm.Height));
+                        g.targetPos = new Vector2(SamMath.RandomRange((float)desktopBounds.Left, (float)desktopBounds.Right), SamMath.RandomRange((float)desktopBounds.Top, (float)desktopBounds.Bottom));
                         trackMudTaskData.nextDirChangeTime = Time.time + TrackMudTaskData.GetDirChangeInterval();
                     }
                     if (Time.time > trackMudTaskData.timeToStopRunning)
                     {
                         g.targetPos = g.position + new Vector2(30f, 3f);
-                        g.targetPos.x = SamMath.Clamp(g.targetPos.x, 55f, (float)(Program.mainForm.Width - 55));
-                        g.targetPos.y = SamMath.Clamp(g.targetPos.y, 80f, (float)(Program.mainForm.Height - 80));
+                        g.targetPos.x = SamMath.Clamp(g.targetPos.x, (float)(desktopBounds.Left + 55), (float)(desktopBounds.Right - 55));
+                        g.targetPos.y = SamMath.Clamp(g.targetPos.y, (float)(desktopBounds.Top + 80), (float)(desktopBounds.Bottom - 80));
                         GooseFunctions.SetTaskByID(g, "Wander", false);
                     }
                     break;
