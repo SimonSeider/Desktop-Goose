@@ -16,3 +16,9 @@ The original `Pat` sound assets were lost/corrupted in the recovered resources a
 ## Credit
 
 All credit for the original Desktop Goose app goes to **Samson**, who originally created it.
+
+## Copyright / License Contact
+
+If any copyright or license issue occurs regarding this repository, please contact:
+
+`contact at exil dot dev`
